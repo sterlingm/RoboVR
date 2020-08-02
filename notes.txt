@@ -1,0 +1,21 @@
+Installation:
+install xr interaction toolkit via package manager
+project settings->xr plug-in management->install xr plug-in management, then check the corresponding "provider"
+
+Add gameobject XR->Room Scale XR Rig
+	- The XR option should appear if XR Interaction Toolkit is installed.
+
+Setting up scene:
+Follow the ros-sharp tutorial
+Don't forget to enable isKinematic on the turtlebot game object after it's imported from ROS
+
+
+Problems:
+Robot's camera is falling off or not in the correct pose
+	- Enable isKinematic
+
+You can see the scene with HMD when only Unity is running, but when running Unity and ROS together there is some error tracking the HMD pose.
+	- for oculus rift s, this seems to also happen when the project begins. it seems to be an error on the oculus side because the notification comes from the oculus software.
+
+Can't see anything when you put on HMD
+	- Try to put the HMD on before starting the project. 
