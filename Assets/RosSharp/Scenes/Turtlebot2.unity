@@ -7469,8 +7469,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ea923ec01a4a92458c1ba541979ea1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rgbImage: {fileID: 1775297774}
-  depthImage: {fileID: 1775297774}
+  rgbImageSub: {fileID: 1775297774}
+  depthImageSub: {fileID: 1775297774}
+  Topic: /muh_image
 --- !u!114 &874043163
 MonoBehaviour:
   m_ObjectHideFlags: 0
