@@ -22,8 +22,15 @@ namespace RosSharp.RosBridgeClient
     {
         public MeshRenderer meshRenderer;
 
+        public int height;
+        public int width;
+
         private Texture2D texture2D;
         private byte[] imageData;
+        public byte[] ImageData
+        {
+            get { return imageData; }
+        }
         private bool isMessageReceived;
 
         protected override void Start()
@@ -51,7 +58,6 @@ namespace RosSharp.RosBridgeClient
             meshRenderer.material.SetTexture("_MainTex", texture2D);
             isMessageReceived = false;
         }
-
     }
 }
 
