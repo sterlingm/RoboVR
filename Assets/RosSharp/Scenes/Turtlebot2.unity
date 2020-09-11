@@ -7466,12 +7466,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 874043160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ea923ec01a4a92458c1ba541979ea1d, type: 3}
+  m_Script: {fileID: 11500000, guid: bdbe037cc0c076c4ba634033585eb5e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   rgbImageSub: {fileID: 1775297774}
-  depthImageSub: {fileID: 1775297774}
-  Topic: /muh_image
+  depthImageSub: {fileID: 1775297777}
+  TopicRGB: /my_imagergb
+  TopicDepth: /my_imagedepth
 --- !u!114 &874043163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14270,10 +14271,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1775297773}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef6e2677fa36b0c46a9f6d8bd354c686, type: 3}
+  m_Script: {fileID: 11500000, guid: a2c8834e8d7cf3f4aa74fe40f55dd3d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Topic: /camera/depth/image_raw/compressed
+  Topic: /camera/depth/image/compressedDepth
   TimeStep: 0
   meshRenderer: {fileID: 831487146}
   height: 480

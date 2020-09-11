@@ -31,7 +31,12 @@ namespace RosSharp.RosBridgeClient
         {
             get { return imageData; }
         }
-        private bool isMessageReceived;
+
+        private bool isMessageReceived=false;
+        public bool IsMessageReceived
+        {
+            get { return isMessageReceived; }
+        }
 
         protected override void Start()
         {
