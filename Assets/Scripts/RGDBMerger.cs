@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using OpenCvSharp;
 using RosSharp.RosBridgeClient;
 using System.Runtime.InteropServices;
 
@@ -61,27 +60,35 @@ public class RGDBMerger : MonoBehaviour
 
     void MergeImages()
     {
-        if (rgbImageSub.IsMessageReceived && depthImageSub.IsMessageReceived)
+        if (rgbImageSub.IsMessageReceived)// && depthImageSub.IsMessageReceived)
         {                
             // Calculate number of elements in byte array
             int len = (rgbImageSub.width * 3) * rgbImageSub.height;
 
             // Allocate managed memory array
             rgbImage.data = new byte[len];
-
+ 
             // Allocate unmanaged memory
             System.IntPtr mem = Marshal.AllocHGlobal(len);
-
+ 
             // Call dllimport function to fill in unmanaged memory
             processImage(rgbImageSub.ImageData, rgbImageSub.ImageData.Length, 0, rgbImageSub.width, rgbImageSub.height, len, out mem);
-
+ 
             //Debug.Log(string.Format("rgbImage data size: {0} mem size: {1} rgb.data size: {2}", rgbImageSub.ImageData.Length, mem.GetType(), rgbImage.data.Length));
 
             // Copy unmanaged memory into managed byte array
             Marshal.Copy(mem, rgbImage.data, 0, len);
 
+            byte[] temp = new byte[10];
+            Marshal.Copy(mem, temp, 0, 10);
+
+            byte[] temp2 = new byte[10];
+            Buffer.BlockCopy(rgbImage.data, 0, temp2, 0, 10);
+
+
             // Deallocate unmanaged memory
-            Marshal.FreeHGlobal(mem);
+            // Unity crashes here?
+            //Marshal.FreeHGlobal(mem);
 
             // Set image fields
             rgbImage.encoding = "rgb8";
@@ -117,7 +124,6 @@ public class RGDBMerger : MonoBehaviour
                 
             // Call dllimport function to fill in unmanaged memory
             processImage(depthImageSub.ImageData, depthImageSub.ImageData.Length, 1, depthImageSub.width, depthImageSub.height, lenDepth, out memDepth);
-            //processImage(test, ref debug, depthImageSub.ImageData.Length, 0, depthImageSub.width, depthImageSub.height, lenDepth, out memDepth);
                 
             // Copy unmanaged memory into managed byte array
             Marshal.Copy(memDepth, depthImage.data, 0, lenDepth);
@@ -136,11 +142,11 @@ public class RGDBMerger : MonoBehaviour
                 
             PublishDepth(depthImage);    */            
         }
-        else
+        /*else
         {
             Debug.Log("Image data is null!");
             Debug.Log("rgb: " + rgbImageSub.ImageData + " depth: " + depthImageSub.ImageData);
-        }
+        }*/
     }
 
 }
