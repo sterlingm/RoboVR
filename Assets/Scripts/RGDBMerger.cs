@@ -60,7 +60,7 @@ public class RGDBMerger : MonoBehaviour
 
     void MergeImages()
     {
-        if (rgbImageSub.IsMessageReceived)// && depthImageSub.IsMessageReceived)
+        if (rgbImageSub.IsMessageReceived && depthImageSub.IsMessageReceived)
         {                
             // Calculate number of elements in byte array
             int len = (rgbImageSub.width * 3) * rgbImageSub.height;
@@ -79,12 +79,6 @@ public class RGDBMerger : MonoBehaviour
             // Copy unmanaged memory into managed byte array
             Marshal.Copy(mem, rgbImage.data, 0, len);
 
-            byte[] temp = new byte[10];
-            Marshal.Copy(mem, temp, 0, 10);
-
-            byte[] temp2 = new byte[10];
-            Buffer.BlockCopy(rgbImage.data, 0, temp2, 0, 10);
-
 
             // Deallocate unmanaged memory
             // Unity crashes here?
@@ -102,18 +96,14 @@ public class RGDBMerger : MonoBehaviour
             // Test by publishing image and checking rviz
             PublishRGB(rgbImage);
                 
-
-
-
-
-
+            
 
             /* Depth image */
                 
             // Calculate number of elements in byte array
             // Dynamically determine number of bits to represent pixels? 8bit vs 16bit vs 32bit
             // pngs are 32 bit so *4 is used
-            /*int lenDepth = (depthImageSub.width * depthImageSub.height) * 4;
+            int lenDepth = (depthImageSub.width * depthImageSub.height) * 4;
 
             // Allocate managed memory array
             depthImage.data = new byte[lenDepth];
@@ -140,7 +130,7 @@ public class RGDBMerger : MonoBehaviour
             depthImage.step = 2560;
             depthImage.header.frame_id = "camera_rgb_optical_frame";
                 
-            PublishDepth(depthImage);    */            
+            PublishDepth(depthImage);         
         }
         /*else
         {
