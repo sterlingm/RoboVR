@@ -14,6 +14,7 @@ limitations under the License.
 */
 
 using UnityEngine;
+using System.Diagnostics;
 
 namespace RosSharp.RosBridgeClient
 {
@@ -37,6 +38,12 @@ namespace RosSharp.RosBridgeClient
         {
             get { return isMessageReceived; }
         }
+        
+        private Messages.Standard.Time stamp;
+        public Messages.Standard.Time Stamp
+        {
+            get { return stamp; }
+        }
 
         protected override void Start()
         {
@@ -52,6 +59,7 @@ namespace RosSharp.RosBridgeClient
 
         protected override void ReceiveMessage(Messages.Sensor.CompressedImage compressedImage)
         {
+            stamp = compressedImage.header.stamp;
             imageData = compressedImage.data;
             isMessageReceived = true;
         }

@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 using UnityEngine;
 
 namespace RosSharp.RosBridgeClient
@@ -38,6 +37,12 @@ namespace RosSharp.RosBridgeClient
             get { return isMessageReceived; }
         }
 
+        private Messages.Standard.Time stamp;
+        public Messages.Standard.Time Stamp
+        {
+            get { return stamp; }
+        }
+
         protected override void Start()
         {
 			base.Start();
@@ -52,6 +57,7 @@ namespace RosSharp.RosBridgeClient
 
         protected override void ReceiveMessage(Messages.Sensor.CompressedImage compressedImage)
         {
+            stamp = compressedImage.header.stamp;
             imageData = compressedImage.data;
             isMessageReceived = true;
         }
