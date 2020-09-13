@@ -79,10 +79,9 @@ public class RGDBMerger : MonoBehaviour
             // Copy unmanaged memory into managed byte array
             Marshal.Copy(mem, rgbImage.data, 0, len);
 
-
             // Deallocate unmanaged memory
             // Unity crashes here?
-            //Marshal.FreeHGlobal(mem);
+            Marshal.FreeHGlobal(mem);
 
             // Set image fields
             rgbImage.encoding = "rgb8";
@@ -110,7 +109,6 @@ public class RGDBMerger : MonoBehaviour
 
             // Allocate unmanaged memory
             System.IntPtr memDepth = Marshal.AllocHGlobal(lenDepth);
-                
                 
             // Call dllimport function to fill in unmanaged memory
             processImage(depthImageSub.ImageData, depthImageSub.ImageData.Length, 1, depthImageSub.width, depthImageSub.height, lenDepth, out memDepth);

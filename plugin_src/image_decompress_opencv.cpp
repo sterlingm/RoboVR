@@ -31,7 +31,7 @@ extern "C"
 
 			// Set image data
 			// len should be calculated and set in Unity
-			*image = (unsigned char*)malloc(len);
+			//*image = (unsigned char*)malloc(len);
 
 			// Copy over the data
 			memcpy(*image, decompressed.data, len);
