@@ -23,17 +23,29 @@ namespace RosSharp.RosBridgeClient
 
         public int height;
         public int width;
-        
+        public string encoding;
+
         private byte[] imageData;
         public byte[] ImageData
         {
-            get { return imageData; }
+            get { hasNew = false; return imageData; }
         }
+
+        private bool hasNew = false;
+        public bool HasNew { get { return hasNew; } }
+
+
         private bool isMessageReceived;
 
+        private Messages.Standard.Time stamp;
+        public Messages.Standard.Time Stamp
+        {
+            get { return stamp; }
+        }
         protected override void Start()
         {
 			base.Start();
+            stamp = new Messages.Standard.Time();
         }
         private void Update()
         {
@@ -41,10 +53,15 @@ namespace RosSharp.RosBridgeClient
                 ProcessMessage();
         }
 
-        protected override void ReceiveMessage(Messages.Sensor.Image compressedImage)
+        protected override void ReceiveMessage(Messages.Sensor.Image image)
         {
-            imageData = compressedImage.data;
+            //double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
+            //double nowTime = (double)image.header.stamp.secs + (double)(image.header.stamp.nsecs * .000000001);
+            //MonoBehaviour.print(string.Format("image raw compressed elapsed time: {0} last time: {1} now time: {2}",  (nowTime - lastTime), lastTime, nowTime));
+            stamp = image.header.stamp;
+            imageData = image.data;
             isMessageReceived = true;
+            hasNew = true;
         }
 
         private void ProcessMessage()

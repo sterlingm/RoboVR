@@ -1,0 +1,116 @@
+﻿//sd
+/*
+static const float cx = 255;
+static const float cy = 210;
+
+static const float fx = 365;
+static const float fy = 365; 
+
+static const int DepthWidth = 512;
+static const int DepthHeight = 424;
+*/
+
+//qhd
+
+// Kinect
+/*static const float cx = 474.23;
+static const float cy = 271.73;
+
+static const float fx = 530.56;
+static const float fy = 531.54;
+
+static const int DepthWidth = 1920 / 2;
+static const int DepthHeight = 1080 / 2; */
+
+// Asus Xtion Pro
+static const float cx = 319.5;
+static const float cy = 239.5;
+static const float fx = 570.3422f;
+static const float fy = 319.5f;
+static const int DepthWidth = 640;
+static const int DepthHeight = 480;
+
+
+
+//hd
+/*
+static const float cx = 965;
+static const float cy = 536;
+
+static const float fx = 1068;
+static const float fy = 1068;
+
+
+static const int DepthWidth = 1920;
+static const int DepthHeight = 1080;
+*/
+
+
+
+
+static const float MillimetersToMetersScale = 1.0 / 1000.0;
+
+//static const float2 DepthWidthHeight = float2(DepthWidth, DepthHeight);
+//static const float2 DepthHalfWidthHeight = DepthWidthHeight / 2.0;
+
+static const float SensorHorizontalFOVDegrees = 50;
+static const float XYSpread = 2 * tan(radians(SensorHorizontalFOVDegrees) * 0.5) / (DepthWidth * 0.5);
+
+static const float MinDepthMM = 500.0;
+static const float MaxDepthMM = 8000.0;
+
+
+
+
+
+
+
+
+// vertex offsets for building a quad from a depth pixel
+static const float4 quadOffsets[4] =
+{
+    float4( 1.0, 0.0, 0, 0),
+    float4( 0.0, 0.0, 0, 0),
+    float4( 1.0, 1.0, 0, 0),
+    float4( 0.0, 1.0, 0, 0),
+};
+
+// texture lookup offsets for loading current and nearby depth pixels
+static const int3 textureOffsets4Samples[4] =
+{
+    int3(1, 0, 0),
+    int3(0, 0, 0),
+    int3(1, 1, 0),
+    int3(0, 1, 0),
+};
+
+struct EMPTY_INPUT
+{
+};
+
+struct POSCOLOR_INPUT
+{
+    float4 pos		: POSITION;
+	float4 color   : COLOR;
+};
+
+float DepthFromPacked4444(float4 packedDepth)
+{
+    // convert from [0,1] to [0,15]
+    packedDepth *= 15.01f;
+
+    // truncate to an int
+    int4 rounded = (int4)packedDepth;
+
+    return rounded.w * 4096 + rounded.x * 256 + rounded.y * 16 + rounded.z;
+}
+
+EMPTY_INPUT VS_Empty()
+{
+    return (EMPTY_INPUT)0;
+}
+
+float4 FS_Passthrough(POSCOLOR_INPUT input) : COLOR
+{
+	return input.color;
+}

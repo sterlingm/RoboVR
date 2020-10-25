@@ -19,23 +19,22 @@ namespace RosSharp.RosBridgeClient
     [RequireComponent(typeof(RosConnector))]
     public class ImageSubscriber : Subscriber<Messages.Sensor.CompressedImage>
     {
-        public MeshRenderer meshRenderer;
 
         public int height;
         public int width;
+        public string encoding;
+        
 
-        private Texture2D texture2D;
         private byte[] imageData;
         public byte[] ImageData
         {
-            get { return imageData; }
+            get { hasNew = false;  return imageData; }
         }
 
+        private bool hasNew = false;
+        public bool HasNew { get { return hasNew; } }
+
         private bool isMessageReceived=false;
-        public bool IsMessageReceived
-        {
-            get { return isMessageReceived; }
-        }
 
         private Messages.Standard.Time stamp;
         public Messages.Standard.Time Stamp
@@ -46,9 +45,9 @@ namespace RosSharp.RosBridgeClient
         protected override void Start()
         {
 			base.Start();
-            texture2D = new Texture2D(1, 1);
-            meshRenderer.material = new Material(Shader.Find("Standard"));
+            stamp = new Messages.Standard.Time();
         }
+
         private void Update()
         {
             if (isMessageReceived)
@@ -57,16 +56,17 @@ namespace RosSharp.RosBridgeClient
 
         protected override void ReceiveMessage(Messages.Sensor.CompressedImage compressedImage)
         {
+            //double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
+            //double nowTime = (double)compressedImage.header.stamp.secs + (double)(compressedImage.header.stamp.nsecs * .000000001);
+            //MonoBehaviour.print(string.Format("rgb compressed elapsed time: {0} last time: {1} now time: {2}",  (nowTime - lastTime), lastTime, nowTime));
             stamp = compressedImage.header.stamp;
             imageData = compressedImage.data;
             isMessageReceived = true;
+            hasNew = true;
         }
 
         private void ProcessMessage()
         {
-            texture2D.LoadImage(imageData);
-            texture2D.Apply();
-            meshRenderer.material.SetTexture("_MainTex", texture2D);
             isMessageReceived = false;
         }
     }
