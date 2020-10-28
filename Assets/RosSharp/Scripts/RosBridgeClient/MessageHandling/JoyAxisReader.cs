@@ -23,6 +23,7 @@ namespace RosSharp.RosBridgeClient
         
         public float Read()
         {
+            Debug.Log("Name: " + Name + " Value: " + Input.GetAxis(Name));
             return Input.GetAxis(Name);              
         }
     }
