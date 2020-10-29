@@ -17,11 +17,11 @@ using UnityEngine;
 
 namespace RosSharp.RosBridgeClient
 {
-    public class PointCloud
+    public class PointCloud 
     {
         public Point[] Points;
         
-        public PointCloud(Messages.Sensor.Image depthImage, Messages.Sensor.Image rgbImage, float focalX, float focalY)
+        public PointCloud(MessageTypes.Sensor.Image depthImage, MessageTypes.Sensor.Image rgbImage, float focalX, float focalY)
         {
             uint width = depthImage.width;
             uint height = depthImage.height;

@@ -1,9 +1,9 @@
-﻿using RosSharp.RosBridgeClient.Messages.Sensor;
+﻿using RosSharp.RosBridgeClient.MessageTypes.Sensor;
 using UnityEngine;
 
 namespace RosSharp.RosBridgeClient
 {
-    public class PointCloud2Subscriber : Subscriber<Messages.Sensor.PointCloud2>
+    public class PointCloud2Subscriber : Subscriber<MessageTypes.Sensor.PointCloud2>
     {
     
         public uint width, height;

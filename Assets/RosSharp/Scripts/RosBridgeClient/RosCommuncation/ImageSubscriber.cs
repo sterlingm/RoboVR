@@ -17,7 +17,7 @@ using UnityEngine;
 namespace RosSharp.RosBridgeClient
 {
     [RequireComponent(typeof(RosConnector))]
-    public class ImageSubscriber : Subscriber<Messages.Sensor.CompressedImage>
+    public class ImageSubscriber : Subscriber<MessageTypes.Sensor.CompressedImage>
     {
 
         public int height;
@@ -36,8 +36,8 @@ namespace RosSharp.RosBridgeClient
 
         private bool isMessageReceived=false;
 
-        private Messages.Standard.Time stamp;
-        public Messages.Standard.Time Stamp
+        private MessageTypes.Std.Time stamp;
+        public MessageTypes.Std.Time Stamp
         {
             get { return stamp; }
         }
@@ -45,7 +45,7 @@ namespace RosSharp.RosBridgeClient
         protected override void Start()
         {
 			base.Start();
-            stamp = new Messages.Standard.Time();
+            stamp = new MessageTypes.Std.Time();
         }
 
         private void Update()
@@ -54,7 +54,7 @@ namespace RosSharp.RosBridgeClient
                 ProcessMessage();
         }
 
-        protected override void ReceiveMessage(Messages.Sensor.CompressedImage compressedImage)
+        protected override void ReceiveMessage(MessageTypes.Sensor.CompressedImage compressedImage)
         {
             //double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
             //double nowTime = (double)compressedImage.header.stamp.secs + (double)(compressedImage.header.stamp.nsecs * .000000001);

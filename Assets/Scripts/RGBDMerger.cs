@@ -15,8 +15,8 @@ public class RGBDMerger : MonoBehaviour
 
     public bool usingCompressedDepth;
 
-    public RosSharp.RosBridgeClient.Messages.Sensor.Image rgbImage;
-    public RosSharp.RosBridgeClient.Messages.Sensor.Image depthImage;
+    public RosSharp.RosBridgeClient.MessageTypes.Sensor.Image rgbImage;
+    public RosSharp.RosBridgeClient.MessageTypes.Sensor.Image depthImage;
 
     private Texture2D depthTexture;
     private Texture2D colorTexture;
@@ -29,6 +29,7 @@ public class RGBDMerger : MonoBehaviour
 
     private PointCloud pointCloud;
     private Mesh combinedMesh;
+    
 
     #region MonoBehaviour Start, Destroy 
     // Start is called before the first frame update
@@ -36,10 +37,10 @@ public class RGBDMerger : MonoBehaviour
     {
 
 
-        publicationIdRGB = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.Messages.Sensor.Image>(TopicRGB);
-        publicationIdDepth = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.Messages.Sensor.Image>(TopicDepth);
-        rgbImage = new RosSharp.RosBridgeClient.Messages.Sensor.Image();
-        depthImage = new RosSharp.RosBridgeClient.Messages.Sensor.Image();
+        publicationIdRGB = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.MessageTypes.Sensor.Image>(TopicRGB);
+        publicationIdDepth = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.MessageTypes.Sensor.Image>(TopicDepth);
+        rgbImage = new RosSharp.RosBridgeClient.MessageTypes.Sensor.Image();
+        depthImage = new RosSharp.RosBridgeClient.MessageTypes.Sensor.Image();
 
         // Create a texture for the depth image and color image
         depthTexture = new Texture2D(depthImageSub.width, depthImageSub.height, TextureFormat.R16, false);
@@ -101,8 +102,8 @@ public class RGBDMerger : MonoBehaviour
         Debug.Log("Joysticks: "+UnityEngine.Input.GetJoystickNames());
         //Debug.Log(UnityEngine.Input.GetAxis("Vertical"));
 
-        RosSharp.RosBridgeClient.Messages.Standard.Time rgbStamp = null;
-        RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
+        RosSharp.RosBridgeClient.MessageTypes.Std.Time rgbStamp = null;
+        RosSharp.RosBridgeClient.MessageTypes.Std.Time depthStamp = null;
         
         // Make sure both images have been received
         if (usingCompressedDepth && (rgbImageSub.ImageData != null && depthImageSub.ImageData != null) ||

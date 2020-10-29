@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace RosSharp.RosBridgeClient
 {
-    public class LaserScanSubscriber : Subscriber<Messages.Sensor.LaserScan>
+    public class LaserScanSubscriber : Subscriber<MessageTypes.Sensor.LaserScan>
     {
         public LaserScanWriter laserScanWriter;
 
@@ -27,9 +27,8 @@ namespace RosSharp.RosBridgeClient
             base.Start();
         }
 
-        protected override void ReceiveMessage(Messages.Sensor.LaserScan laserScan)
+        protected override void ReceiveMessage(MessageTypes.Sensor.LaserScan laserScan)
         {
-           Debug.Log("In laser scan sub");
             laserScanWriter.Write(laserScan);
         }
     }
