@@ -7478,6 +7478,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 3819c58a8a46792448f5a4b303056805, type: 2}
   TopicRGB: /myimage_rgb
   TopicDepth: /myimage_depth
+  odomSub: {fileID: 288399404}
 --- !u!33 &874043162
 MeshFilter:
   m_ObjectHideFlags: 0

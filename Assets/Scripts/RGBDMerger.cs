@@ -29,7 +29,9 @@ public class RGBDMerger : MonoBehaviour
 
     private PointCloud pointCloud;
     private Mesh combinedMesh;
-    
+
+    public OdometrySubscriber odomSub;
+
 
     #region MonoBehaviour Start, Destroy 
     // Start is called before the first frame update
@@ -328,11 +330,12 @@ public class RGBDMerger : MonoBehaviour
         material.SetPass(0);
 
 
+
         // Draw mesh
         Quaternion iden = Quaternion.identity;
         //Graphics.DrawMeshNow(combinedMesh, new Vector3(0, 0, 0), iden);
-        Matrix4x4 m = Matrix4x4.TRS(new Vector3(0, 0, 0),
-                          iden, new UnityEngine.Vector3(1, 1, 1));
+        Matrix4x4 m = Matrix4x4.TRS(odomSub.PublishedTransform.position,
+                          odomSub.PublishedTransform.rotation, new UnityEngine.Vector3(1, 1, 1));
         material.SetMatrix("transformationMatrix", m);
 
 
