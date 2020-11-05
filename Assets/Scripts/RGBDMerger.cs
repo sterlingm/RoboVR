@@ -100,9 +100,6 @@ public class RGBDMerger : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Joysticks: "+UnityEngine.Input.GetJoystickNames());
-        //Debug.Log(UnityEngine.Input.GetAxis("Vertical"));
-
         RosSharp.RosBridgeClient.Messages.Standard.Time rgbStamp = null;
         RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
         
@@ -115,7 +112,7 @@ public class RGBDMerger : MonoBehaviour
         }
         else
         {
-            Debug.Log("Have not received image data");
+            Debug.Log("Image data not received...");
         }
         
         

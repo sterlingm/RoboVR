@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using UnityEngine;
+
 namespace RosSharp.RosBridgeClient
 {
     public class JoyPublisher : Publisher<Messages.Sensor.Joy>
@@ -53,9 +55,12 @@ namespace RosSharp.RosBridgeClient
         private void UpdateMessage()
         {
             message.header.Update();
+            //MonoBehaviour.print("Readers.Length: "+JoyAxisReaders.Length);
 
             for (int i = 0; i < JoyAxisReaders.Length; i++)
+            {
                 message.axes[i] = JoyAxisReaders[i].Read();
+            }
             
             for (int i = 0; i < JoyButtonReaders.Length; i++)
                 message.buttons[i] = (JoyButtonReaders[i].Read() ? 1 : 0);

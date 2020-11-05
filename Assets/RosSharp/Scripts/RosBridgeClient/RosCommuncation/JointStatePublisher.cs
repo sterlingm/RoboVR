@@ -54,7 +54,10 @@ namespace RosSharp.RosBridgeClient
             for (int i = 0; i < JointStateReaders.Count; i++)
                 UpdateJointState(i);
 
-            Publish(message);
+            if(message.name.Length > 0)
+            {
+                Publish(message);
+            }
         }
 
         private void UpdateJointState(int i)
