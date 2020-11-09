@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using RosSharp.RosBridgeClient;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 public class RGBDMerger : MonoBehaviour
 {
@@ -32,12 +33,13 @@ public class RGBDMerger : MonoBehaviour
 
     public OdometrySubscriber odomSub;
 
+
+    Stopwatch stopwatch = new Stopwatch();
+
     #region MonoBehaviour Start, Destroy 
     // Start is called before the first frame update
     void Start()
     {
-
-
         publicationIdRGB = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.Messages.Sensor.Image>(TopicRGB);
         publicationIdDepth = GetComponent<RosConnector>().RosSocket.Advertise<RosSharp.RosBridgeClient.Messages.Sensor.Image>(TopicDepth);
         rgbImage = new RosSharp.RosBridgeClient.Messages.Sensor.Image();
@@ -46,50 +48,8 @@ public class RGBDMerger : MonoBehaviour
         // Create a texture for the depth image and color image
         depthTexture = new Texture2D(depthImageSub.width, depthImageSub.height, TextureFormat.R16, false);
         colorTexture = new Texture2D(rgbImageSub.width, rgbImageSub.height, TextureFormat.RGB24, false);
-
-
-        // Don't get the mesh from the game object because that assumes you have a mesh to drag onto this object
-        //combinedMesh = GetComponent<MeshFilter>().mesh;
-        //combinedMesh.vertices = vertices;
-        //mesh.triangles = triangles;
-        //mesh.Optimize();
-        //mesh.RecalculateNormals();
-
-        // New as of 10/20
-        // Build a new mesh since we don't already have one ready to go
-        combinedMesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = combinedMesh;
-        //CreateExMesh();
-        //combinedMesh.Clear();
     }
-
-    void CreateExMesh()
-    {
-        Vector3[] points = new Vector3[4];
-        int[] indices = new int[points.Length];
-        for (int i = 0; i < points.Length; i++)
-        {
-            Point p = new Point();
-            p.x = i;
-            p.y = i;
-            p.z = i < 2 ? i : i*2;
-            Vector3 v = new Vector3(p.x, p.y, p.z);
-            points[i] = v;
-            indices[i] = i;
-        }
-        int[] triangles = { 0, 1, 2, 2, 1, 3 };
-        Vector2[] vertices_uv = new Vector2[4];
-        vertices_uv[0] = new Vector2(0.0f, 1.0f);
-        vertices_uv[1] = new Vector2(1.0f, 1.0f);
-        vertices_uv[2] = new Vector2(0.0f, 0.0f);
-        vertices_uv[3] = new Vector2(1.0f, 0.0f);
-
-        // Build Mesh here?
-        combinedMesh.vertices = points;
-        combinedMesh.uv = vertices_uv;
-        combinedMesh.triangles = triangles;
-        combinedMesh.RecalculateNormals();
-    }
+    
 
     private void OnDestroy()
     {
@@ -104,30 +64,34 @@ public class RGBDMerger : MonoBehaviour
         RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
         
         // Make sure both images have been received
-        if (usingCompressedDepth && (rgbImageSub.ImageData != null && depthImageSub.ImageData != null) ||
-            usingCompressedDepth == false && (rgbImageSub.ImageData != null && depthImageRawSub.ImageData != null))
+        //if (usingCompressedDepth && (rgbImageSub.ImageData != null && depthImageSub.ImageData != null) ||
+        //    usingCompressedDepth == false && (rgbImageSub.ImageData != null && depthImageRawSub.ImageData != null))
+        if (usingCompressedDepth && (rgbImageSub.HasNew && depthImageSub.HasNew) ||
+            usingCompressedDepth == false && (rgbImageSub.HasNew && depthImageRawSub.HasNew))
         {
             rgbStamp = rgbImageSub.Stamp;
             depthStamp = usingCompressedDepth ? depthImageSub.Stamp : depthImageRawSub.Stamp;
+            UnityEngine.Debug.Log("Image data received");
         }
         else
         {
-            Debug.Log("Image data not received...");
+            UnityEngine.Debug.Log("Image data not received...");
         }
         
         
 
-        // Check if the images are stamped close together
-        if (rgbStamp != null && (rgbStamp.secs - depthStamp.secs < 3))
+        // If images are received, then decompress them
+        if (rgbStamp != null)
         {
+            UnityEngine.Debug.Log("Loading images");
             DecompressImages();
             if (usingCompressedDepth == false)
             {
-                depthImage.data = depthImageRawSub.ImageData;
+                depthImage.data = depthImageRawSub.GetNew();
             }
             LoadImages();
 
-            Debug.Log("Publishing...");
+            //UnityEngine.Debug.Log("Publishing...");
             // Test by publishing image and checking rviz
             //PublishRGB();
             //PublishDepth();
@@ -141,7 +105,9 @@ public class RGBDMerger : MonoBehaviour
     void LoadImages()
     {
         if (rgbImageSub.ImageData != null)
-        {
+        //if (rgbImageSub.ImageData != null)
+        //if (rgbImageSub.HasNew)
+            {
             //Debug.Log("color texture updated");
             //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
             colorTexture.LoadRawTextureData(rgbImage.data);
@@ -150,7 +116,8 @@ public class RGBDMerger : MonoBehaviour
         }
 
         if (usingCompressedDepth && depthImageSub.ImageData != null)
-        {
+        //if (usingCompressedDepth && depthImageSub.HasNew)
+            {
             //Debug.Log("depth texture updated");
             //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
             depthTexture.LoadRawTextureData(depthImage.data);
@@ -159,6 +126,7 @@ public class RGBDMerger : MonoBehaviour
         }
 
         else if (usingCompressedDepth == false && depthImageRawSub.ImageData != null)
+        //else if (usingCompressedDepth == false && depthImageRawSub.HasNew)
         {
             //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
             depthTexture.LoadRawTextureData(depthImage.data);
@@ -226,7 +194,7 @@ public class RGBDMerger : MonoBehaviour
         System.IntPtr mem = Marshal.AllocHGlobal(len);
 
         // Call dllimport function to fill in unmanaged memory
-        processImage(rgbImageSub.ImageData, rgbImageSub.ImageData.Length, 0, rgbImageSub.width, rgbImageSub.height, len, out mem);
+        processImage(rgbImageSub.GetNew(), rgbImageSub.Length(), 0, rgbImageSub.width, rgbImageSub.height, len, out mem);
 
         //Debug.Log(string.Format("rgbImage data size: {0} mem size: {1} rgb.data size: {2}", rgbImageSub.ImageData.Length, mem.GetType(), rgbImage.data.Length));
 
@@ -256,7 +224,7 @@ public class RGBDMerger : MonoBehaviour
         System.IntPtr memDepth = Marshal.AllocHGlobal(lenDepth);
 
         // Call dllimport function to fill in unmanaged memory
-        processImage(depthImageSub.ImageData, depthImageSub.ImageData.Length, 1, depthImageSub.width, depthImageSub.height, lenDepth, out memDepth);
+        processImage(depthImageSub.GetNew(), depthImageSub.Length(), 1, depthImageSub.width, depthImageSub.height, lenDepth, out memDepth);
 
         // Copy unmanaged memory into managed byte array
         Marshal.Copy(memDepth, depthImage.data, 0, lenDepth);
@@ -279,47 +247,14 @@ public class RGBDMerger : MonoBehaviour
         }
     }
     #endregion
-
-    protected void MergeImages()
-    {
-        // Fx = 570.3422
-        // Fy = 319.5
-        float focalX = 570.3422f;
-        float focalY = 319.5f;
-        pointCloud = new PointCloud(depthImage, rgbImage, focalX, focalY);
-    }
-
-    private void BuildMeshFromPointCloud()
-    {
-        Vector3[] points = new Vector3[pointCloud.Points.Length];
-        int[] indices = new int[points.Length];
-        for (int i=0;i<points.Length;i++)
-        {
-            Point p = pointCloud.Points[i];
-            Vector3 v = new Vector3(p.x, p.y, p.z);
-            points[i] = v;
-            indices[i] = i;
-        }
-        // Build Mesh here?
-        combinedMesh.vertices = points;
-
-        // Build a sub mesh that is simply all the points of the root mesh
-        /*UnityEngine.Rendering.SubMeshDescriptor subMeshDesc = new UnityEngine.Rendering.SubMeshDescriptor();
-        subMeshDesc.topology = MeshTopology.Points;
-        subMeshDesc.firstVertex = 0;
-        subMeshDesc.indexCount = pointCloud.Points.Length;
-        subMeshDesc.vertexCount = pointCloud.Points.Length;
-        combinedMesh.SetSubMesh(0, subMeshDesc);
-        combinedMesh.subMeshCount = 1;
-
-        combinedMesh.SetIndices(indices, MeshTopology.Points, 0);*/
-
-        //for (int i = 0; i < 20; i++)
-            //pointCloud.printRandPoint(i);
-    }
-
+    
+    
     private void OnRenderObject()
     {
+        //stopwatch.Stop();
+        //UnityEngine.Debug.Log(string.Format("Elapsed time for OnRenderObject: {0}", stopwatch.ElapsedMilliseconds/1000.0));
+        //stopwatch.Restart();
+ 
         // Set textures and pass
         material.SetTexture("_MainTex", depthTexture);
         material.SetTexture("_ColorTex", colorTexture);

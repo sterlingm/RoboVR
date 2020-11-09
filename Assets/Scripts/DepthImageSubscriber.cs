@@ -25,23 +25,18 @@ namespace RosSharp.RosBridgeClient
         public int height;
         public int width;
         public string encoding;
-        
+
 
         private byte[] imageData;
         public byte[] ImageData
         {
-            get { hasNew = false; return imageData; }
+            get { return imageData; }
         }
 
         private bool hasNew = false;
         public bool HasNew { get { return hasNew; } }
 
-        private bool isMessageReceived;
-        public bool IsMessageReceived
-        {
-            get { return isMessageReceived; }
-        }
-        
+
         private Messages.Standard.Time stamp;
         public Messages.Standard.Time Stamp
         {
@@ -53,11 +48,7 @@ namespace RosSharp.RosBridgeClient
             base.Start();
             stamp = new Messages.Standard.Time();
         }
-        private void Update()
-        {
-            if (isMessageReceived)
-                ProcessMessage();
-        }
+
 
         protected override void ReceiveMessage(Messages.Sensor.CompressedImage compressedImage)
         {
@@ -66,14 +57,20 @@ namespace RosSharp.RosBridgeClient
             //MonoBehaviour.print(string.Format("rgb compressed elapsed time: {0} last time: {1} now time: {2}",  (nowTime - lastTime), lastTime, nowTime));
             stamp = compressedImage.header.stamp;
             imageData = compressedImage.data;
-            isMessageReceived = true;
             hasNew = true;
         }
 
-        private void ProcessMessage()
+        public byte[] GetNew()
         {
-            isMessageReceived = false;
+            hasNew = false;
+            return imageData;
         }
+
+        public int Length()
+        {
+            return imageData.Length;
+        }
+
     }
 }
 
