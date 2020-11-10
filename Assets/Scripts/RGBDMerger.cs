@@ -62,52 +62,58 @@ public class RGBDMerger : MonoBehaviour
     {
         RosSharp.RosBridgeClient.Messages.Standard.Time rgbStamp = null;
         RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
+
+        // Check if new data has been received
+        bool rgbImageUpdated = rgbImageSub.HasNew;
+        bool depthImageUpdated = usingCompressedDepth ? depthImageSub.HasNew : depthImageRawSub.HasNew;
         
-        // Make sure both images have been received
-        //if (usingCompressedDepth && (rgbImageSub.ImageData != null && depthImageSub.ImageData != null) ||
-        //    usingCompressedDepth == false && (rgbImageSub.ImageData != null && depthImageRawSub.ImageData != null))
-        if (usingCompressedDepth && (rgbImageSub.HasNew && depthImageSub.HasNew) ||
-            usingCompressedDepth == false && (rgbImageSub.HasNew && depthImageRawSub.HasNew))
+        // Set time stamps
+        if(rgbImageUpdated)
         {
             rgbStamp = rgbImageSub.Stamp;
+        }
+        if(depthImageUpdated)
+        {
             depthStamp = usingCompressedDepth ? depthImageSub.Stamp : depthImageRawSub.Stamp;
+        }
+        // Print some debug info
+        if (depthImageUpdated || rgbImageUpdated)
+        {
             UnityEngine.Debug.Log("Image data received");
         }
         else
         {
             UnityEngine.Debug.Log("Image data not received...");
         }
-        
-        
 
-        // If images are received, then decompress them
-        if (rgbStamp != null)
+        /*
+         * Do decompression if new data has been received
+         */ 
+        if(rgbImageUpdated)
         {
-            UnityEngine.Debug.Log("Loading images");
-            DecompressImages();
-            if (usingCompressedDepth == false)
+            DecompressRGB();
+        }
+        if(depthImageUpdated)
+        {
+            if(usingCompressedDepth)
+            {
+                DecompressDepth();
+            }
+            else
             {
                 depthImage.data = depthImageRawSub.GetNew();
             }
-            LoadImages();
-
-            //UnityEngine.Debug.Log("Publishing...");
-            // Test by publishing image and checking rviz
-            //PublishRGB();
-            //PublishDepth();
-            //MergeImages();
-            //BuildMeshFromPointCloud();
-
         }
+
+        // Load the image data into the textures
+        LoadImages(rgbImageUpdated, depthImageUpdated);
     }
     #endregion
 
-    void LoadImages()
+    void LoadImages(bool rgb, bool depth)
     {
-        if (rgbImageSub.ImageData != null)
-        //if (rgbImageSub.ImageData != null)
-        //if (rgbImageSub.HasNew)
-            {
+        if (rgb)
+        {
             //Debug.Log("color texture updated");
             //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
             colorTexture.LoadRawTextureData(rgbImage.data);
@@ -115,25 +121,14 @@ public class RGBDMerger : MonoBehaviour
             //UnityEngine.Profiling.Profiler.EndSample();
         }
 
-        if (usingCompressedDepth && depthImageSub.ImageData != null)
-        //if (usingCompressedDepth && depthImageSub.HasNew)
-            {
+        if (depth)
+        {
             //Debug.Log("depth texture updated");
             //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
             depthTexture.LoadRawTextureData(depthImage.data);
             depthTexture.Apply();
             //UnityEngine.Profiling.Profiler.EndSample();
         }
-
-        else if (usingCompressedDepth == false && depthImageRawSub.ImageData != null)
-        //else if (usingCompressedDepth == false && depthImageRawSub.HasNew)
-        {
-            //UnityEngine.Profiling.Profiler.BeginSample("Apply Color");
-            depthTexture.LoadRawTextureData(depthImage.data);
-            depthTexture.Apply();
-            //UnityEngine.Profiling.Profiler.EndSample();
-        }
-        
     }
 
     #region Publishing methods
