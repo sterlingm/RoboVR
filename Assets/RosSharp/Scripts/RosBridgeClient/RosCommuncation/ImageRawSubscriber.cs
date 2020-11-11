@@ -51,9 +51,9 @@ namespace RosSharp.RosBridgeClient
 
         protected override void ReceiveMessage(Messages.Sensor.Image image)
         {
-            //double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
-            //double nowTime = (double)image.header.stamp.secs + (double)(image.header.stamp.nsecs * .000000001);
-            //MonoBehaviour.print(string.Format("image raw compressed elapsed time: {0} last time: {1} now time: {2}",  (nowTime - lastTime), lastTime, nowTime));
+            double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
+            double nowTime = (double)image.header.stamp.secs + (double)(image.header.stamp.nsecs * .000000001);
+            print(string.Format("Sub Rec {0}: freq: {1}", Topic, 1/(nowTime - lastTime)));
             stamp = image.header.stamp;
             imageData = image.data;
             hasNew = true;

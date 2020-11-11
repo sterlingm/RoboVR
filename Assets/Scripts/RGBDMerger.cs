@@ -2,6 +2,7 @@
 using RosSharp.RosBridgeClient;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System;
 
 public class RGBDMerger : MonoBehaviour
 {
@@ -27,14 +28,11 @@ public class RGBDMerger : MonoBehaviour
     private string publicationIdRGB;
     public string TopicDepth;
     private string publicationIdDepth;
-
-    private PointCloud pointCloud;
-    private Mesh combinedMesh;
-
+    
     public OdometrySubscriber odomSub;
 
 
-    Stopwatch stopwatch = new Stopwatch();
+    Stopwatch stopwatch;
 
     #region MonoBehaviour Start, Destroy 
     // Start is called before the first frame update
@@ -48,6 +46,8 @@ public class RGBDMerger : MonoBehaviour
         // Create a texture for the depth image and color image
         depthTexture = new Texture2D(depthImageSub.width, depthImageSub.height, TextureFormat.R16, false);
         colorTexture = new Texture2D(rgbImageSub.width, rgbImageSub.height, TextureFormat.RGB24, false);
+
+        stopwatch = new Stopwatch();
     }
     
 
@@ -60,6 +60,8 @@ public class RGBDMerger : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //UnityEngine.Debug.Log(string.Format("Frame rate: {0}", 1 / Time.deltaTime));
+
         RosSharp.RosBridgeClient.Messages.Standard.Time rgbStamp = null;
         RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
 
@@ -86,10 +88,12 @@ public class RGBDMerger : MonoBehaviour
             UnityEngine.Debug.Log("Image data not received...");
         }
 
+        
+        DateTime start = DateTime.Now;
         /*
          * Do decompression if new data has been received
-         */ 
-        if(rgbImageUpdated)
+         */
+        if (rgbImageUpdated)
         {
             DecompressRGB();
         }
@@ -104,9 +108,17 @@ public class RGBDMerger : MonoBehaviour
                 depthImage.data = depthImageRawSub.GetNew();
             }
         }
+        DateTime stop = DateTime.Now;
+        Double elapsedMsDec = (stop - start).TotalMilliseconds;        
+        print(string.Format("elapsedMsDec: {0}", elapsedMsDec));
 
+        start = DateTime.Now;
         // Load the image data into the textures
         LoadImages(rgbImageUpdated, depthImageUpdated);
+        stop = DateTime.Now;
+        Double elapsedMsLoad = (stop - start).TotalMilliseconds;
+        print(string.Format("elapsedMsLoad: {0}", elapsedMsLoad));
+
     }
     #endregion
 
@@ -246,10 +258,11 @@ public class RGBDMerger : MonoBehaviour
     
     private void OnRenderObject()
     {
-        //stopwatch.Stop();
-        //UnityEngine.Debug.Log(string.Format("Elapsed time for OnRenderObject: {0}", stopwatch.ElapsedMilliseconds/1000.0));
-        //stopwatch.Restart();
- 
+        /*stopwatch.Stop();
+        UnityEngine.Debug.Log(string.Format("Elapsed time for OnRenderObject: {0}", stopwatch.ElapsedMilliseconds));
+        stopwatch.Restart();*/
+        DateTime start = DateTime.Now;
+        
         // Set textures and pass
         material.SetTexture("_MainTex", depthTexture);
         material.SetTexture("_ColorTex", colorTexture);
@@ -263,5 +276,13 @@ public class RGBDMerger : MonoBehaviour
 
         // Draw mesh
         Graphics.DrawProceduralNow(MeshTopology.Points, depthImageSub.width * depthImageSub.height, 1);
+
+        DateTime stop = DateTime.Now;
+        Double elapsedMsRen = (stop - start).TotalMilliseconds;
+        print(string.Format("elapsedMsRen: {0}", elapsedMsRen));
+
+        /*stopwatch.Stop();
+        long elapsedTimeRen = stopwatch.ElapsedMilliseconds;
+        print(string.Format("elapsedTimeRen: {0}", elapsedTimeRen));*/
     }
 }
