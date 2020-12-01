@@ -31,7 +31,6 @@ public class RGBDMerger : MonoBehaviour
     
     public OdometrySubscriber odomSub;
 
-    
 
     #region MonoBehaviour Start, Destroy 
     // Start is called before the first frame update
@@ -43,7 +42,7 @@ public class RGBDMerger : MonoBehaviour
         depthImage = new RosSharp.RosBridgeClient.Messages.Sensor.Image();
 
         // Create a texture for the depth image and color image
-        depthTexture = new Texture2D(depthImageSub.width, depthImageSub.height, TextureFormat.R16, false);
+        depthTexture = new Texture2D(depthImageSub.width, depthImageSub.height, TextureFormat.RFloat, false);
         colorTexture = new Texture2D(rgbImageSub.width, rgbImageSub.height, TextureFormat.RGB24, false);
     }
     
@@ -54,28 +53,16 @@ public class RGBDMerger : MonoBehaviour
     #endregion
 
     #region MonoBehaviour Update
-    // Update is called once per frame
     void Update()
     {
         //DateTime startFrame = DateTime.Now;
         //UnityEngine.Debug.Log(string.Format("Frame rate: {0}", 1 / Time.deltaTime));
-
-        RosSharp.RosBridgeClient.Messages.Standard.Time rgbStamp = null;
-        RosSharp.RosBridgeClient.Messages.Standard.Time depthStamp = null;
+        
 
         // Check if new data has been received
         bool rgbImageUpdated = rgbImageSub.HasNew;
         bool depthImageUpdated = usingCompressedDepth ? depthImageSub.HasNew : depthImageRawSub.HasNew;
         
-        // Set time stamps
-        if(rgbImageUpdated)
-        {
-            rgbStamp = rgbImageSub.Stamp;
-        }
-        if(depthImageUpdated)
-        {
-            depthStamp = usingCompressedDepth ? depthImageSub.Stamp : depthImageRawSub.Stamp;
-        }
         // Print some debug info
         if (depthImageUpdated || rgbImageUpdated)
         {
@@ -106,6 +93,11 @@ public class RGBDMerger : MonoBehaviour
                 depthImage.data = depthImageRawSub.GetNew();
             }
         }
+
+        UnityEngine.Debug.Log(string.Format("RGB size: {0} Depth size: {1}", rgbImage.data.Length, depthImage.data.Length));
+
+        //PublishRGB();
+        //PublishDepth();
         /*DateTime stop = DateTime.Now;
         Double elapsedMsDec = (stop - start).TotalMilliseconds;        
         print(string.Format("elapsedMsDec: {0}", elapsedMsDec));*/
@@ -216,14 +208,19 @@ public class RGBDMerger : MonoBehaviour
     protected void DecompressDepth()
     {
         // Calculate number of elements in byte array
-        // Dynamically determine number of bits to represent pixels? 8bit vs 16bit vs 32bit
-        // pngs are 32 bit so *4 is used
+        // TODO: Dynamically determine number of bits to represent pixels?
+        // png 32bit, jpg 16bit
         int lenDepth = (depthImageSub.width * depthImageSub.height);
         if (depthImageSub.encoding.Equals("32FC1"))
         {
             lenDepth *= 4;
         }
-        // Put in other encoding representations...
+        else if (depthImageSub.encoding.Equals("16UC1"))
+        {
+            lenDepth *= 2;
+        }
+        // TODO: Put in other encoding representations...
+
 
         // Allocate managed memory array
         depthImage.data = new byte[lenDepth];

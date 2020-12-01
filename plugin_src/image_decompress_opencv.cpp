@@ -38,6 +38,7 @@ extern "C"
 		}
 
 		// Depth
+		// THIS ASSUMES PNG COMPRESSED IMAGE
 		else
 		{
 			// Hold compression details
@@ -55,6 +56,7 @@ extern "C"
 			cv::Mat decompressed = cv::imdecode(imageData, cv::IMREAD_UNCHANGED);
 
 			// Create matrix to hold the result
+			// CV_32FC1 for PNG compressed image
 			cv::Mat decodedMat(height, width, CV_32FC1);
 
 			/* Reconstruct the image from quantization */

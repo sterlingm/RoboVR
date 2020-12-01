@@ -21,10 +21,13 @@ namespace RosSharp.RosBridgeClient
     [RequireComponent(typeof(RosConnector))]
     public class DepthImageSubscriber : Subscriber<Messages.Sensor.CompressedImage>
     {
-
         public int height;
         public int width;
         public string encoding;
+
+        /*public MeshRenderer meshRenderer;
+        private Texture2D texture2D;*/
+        private bool isMessageReceived;
 
 
         private byte[] imageData;
@@ -47,6 +50,8 @@ namespace RosSharp.RosBridgeClient
         {
             base.Start();
             stamp = new Messages.Standard.Time();
+            /*texture2D = new Texture2D(1,1);
+            meshRenderer.material = new Material(Shader.Find("Standard"));*/
         }
 
 
@@ -54,10 +59,11 @@ namespace RosSharp.RosBridgeClient
         {
             double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
             double nowTime = (double)compressedImage.header.stamp.secs + (double)(compressedImage.header.stamp.nsecs * .000000001);
-            print(string.Format("Sub Rec {0}: elapsed time: {1}", Topic, 1/(nowTime - lastTime)));
+            print(string.Format("Sub Rec {0}: elapsed freq: {1}", Topic, 1/(nowTime - lastTime)));
             stamp = compressedImage.header.stamp;
             imageData = compressedImage.data;
             hasNew = true;
+            isMessageReceived = true;
         }
 
         public byte[] GetNew()
@@ -69,6 +75,21 @@ namespace RosSharp.RosBridgeClient
         public int Length()
         {
             return imageData.Length;
+        }
+
+
+
+        private void Update()
+        {
+            //if (isMessageReceived)
+                //ProcessMessage();
+        }
+        private void ProcessMessage()
+        {
+            /*texture2D.LoadImage(imageData);
+            texture2D.Apply();
+            meshRenderer.material.SetTexture("_MainTex", texture2D);*/
+            isMessageReceived = false;
         }
 
     }

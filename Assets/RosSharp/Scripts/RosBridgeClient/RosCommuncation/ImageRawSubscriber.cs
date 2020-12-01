@@ -25,6 +25,11 @@ namespace RosSharp.RosBridgeClient
         public int width;
         public string encoding;
 
+
+        //public MeshRenderer meshRenderer;
+        //private Texture2D texture2D;
+        private bool isMessageReceived;
+
         private byte[] imageData;
         public byte[] ImageData
         {
@@ -47,6 +52,8 @@ namespace RosSharp.RosBridgeClient
         {
 			base.Start();
             stamp = new Messages.Standard.Time();
+            //texture2D = new Texture2D(1, 1);
+            //meshRenderer.material = new Material(Shader.Find("Standard"));
         }
 
         protected override void ReceiveMessage(Messages.Sensor.Image image)
@@ -57,6 +64,7 @@ namespace RosSharp.RosBridgeClient
             stamp = image.header.stamp;
             imageData = image.data;
             hasNew = true;
+            isMessageReceived = true;
         }
 
         public byte[] GetNew()
@@ -68,6 +76,22 @@ namespace RosSharp.RosBridgeClient
         public int Length()
         {
             return imageData.Length;
+        }
+
+
+
+        private void Update()
+        {
+            if (isMessageReceived)
+                ProcessMessage();
+        }
+        private void ProcessMessage()
+        {
+            //texture2D.LoadImage(imageData);
+            //texture2D.LoadRawTextureData(imageData);
+            //texture2D.Apply();
+            //meshRenderer.material.SetTexture("_MainTex", texture2D);
+            isMessageReceived = false;
         }
     }
 }
