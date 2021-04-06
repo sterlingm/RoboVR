@@ -64,14 +64,14 @@ public class RGBDMerger : MonoBehaviour
         bool depthImageUpdated = usingCompressedDepth ? depthImageSub.HasNew : depthImageRawSub.HasNew;
         
         // Print some debug info
-        if (depthImageUpdated || rgbImageUpdated)
+        /*if (depthImageUpdated || rgbImageUpdated)
         {
             UnityEngine.Debug.Log("Image data received");
         }
         else
         {
             UnityEngine.Debug.Log("Image data not received...");
-        }
+        }*/
 
         
         //DateTime start = DateTime.Now;
@@ -94,7 +94,7 @@ public class RGBDMerger : MonoBehaviour
             }
         }
 
-        UnityEngine.Debug.Log(string.Format("RGB size: {0} Depth size: {1}", rgbImage.data.Length, depthImage.data.Length));
+        //UnityEngine.Debug.Log(string.Format("RGB size: {0} Depth size: {1}", rgbImage.data.Length, depthImage.data.Length));
 
         //PublishRGB();
         //PublishDepth();

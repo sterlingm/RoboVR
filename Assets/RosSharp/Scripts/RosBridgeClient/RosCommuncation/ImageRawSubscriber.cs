@@ -60,7 +60,7 @@ namespace RosSharp.RosBridgeClient
         {
             double lastTime = (double)stamp.secs + (double)(stamp.nsecs * .000000001);
             double nowTime = (double)image.header.stamp.secs + (double)(image.header.stamp.nsecs * .000000001);
-            print(string.Format("Sub Rec {0}: freq: {1}", Topic, 1/(nowTime - lastTime)));
+            //print(string.Format("Sub Rec {0}: freq: {1}", Topic, 1/(nowTime - lastTime)));
             stamp = image.header.stamp;
             imageData = image.data;
             hasNew = true;

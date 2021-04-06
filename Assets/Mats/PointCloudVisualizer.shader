@@ -78,7 +78,7 @@ void GS_Main(point EMPTY_INPUT p[1], uint primID : SV_PrimitiveID, inout Triangl
     //float worldScaledDepth = 1.0 / (4500 * depth * -0.0030711016 + 3.3309495161);
     //float worldScaledDepth = ((float)depth) / 1000;
     //float depth = depth_raw * 66;
-	float depth = depth_raw*32;
+	float depth = depth_raw*2;
     //depth /= 1000;
     //float4 worldPos = float4(-textureCoordinates.y, worldScaledDepth, textureCoordinates.x, 1.0);
     float4 worldPosRos = float4(
